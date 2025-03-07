@@ -222,8 +222,24 @@
                 document.getElementById('player1Score').innerText = player1.score;
                 document.getElementById('player2Score').innerText = player2.score;
             } else {
-                document.getElementById('player1Score').innerText = scoreMap[player1.score] || "40";
-                document.getElementById('player2Score').innerText = scoreMap[player2.score] || "40";
+                // Deuce (40-40) durumunu kontrol et
+                if (player1.score >= 3 && player2.score >= 3 && player1.score === player2.score) {
+                    document.getElementById('player1Score').innerText = "Deuce";
+                    document.getElementById('player2Score').innerText = "Deuce";
+                } else if (player1.score > 3 || player2.score > 3) {
+                    // Avantaj durumu
+                    if (player1.score > player2.score) {
+                        document.getElementById('player1Score').innerText = "Avantaj";
+                        document.getElementById('player2Score').innerText = "40";
+                    } else {
+                        document.getElementById('player1Score').innerText = "40";
+                        document.getElementById('player2Score').innerText = "Avantaj";
+                    }
+                } else {
+                    // Normal skor durumu
+                    document.getElementById('player1Score').innerText = scoreMap[player1.score] || "40";
+                    document.getElementById('player2Score').innerText = scoreMap[player2.score] || "40";
+                }
             }
             document.getElementById('player1Game').innerText = player1.games;
             document.getElementById('player2Game').innerText = player2.games;
@@ -237,7 +253,18 @@
                     endSet();
                 }
             } else {
-                if ((player1.score >= 4 || player2.score >= 4) && Math.abs(player1.score - player2.score) >= 2) {
+                // Deuce durumunda avantaj kontrolü
+                if (player1.score >= 3 && player2.score >= 3) {
+                    if (Math.abs(player1.score - player2.score) >= 2) {
+                        if (player1.score > player2.score) {
+                            player1.games++;
+                        } else {
+                            player2.games++;
+                        }
+                        resetGame();
+                        checkSet();
+                    }
+                } else if ((player1.score >= 4 || player2.score >= 4) && Math.abs(player1.score - player2.score) >= 2) {
                     if (player1.score > player2.score) {
                         player1.games++;
                     } else {
