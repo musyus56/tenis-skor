@@ -2,12 +2,23 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tenis Maç Skorları</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profesyonel Tenis Skor Takip Sistemi</title>
     <style>
-        /* Genel Stil */
+        .logo-container {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            width: 80px;
+        }
+
+        .logo-container img {
+            width: 200%;
+            height: auto;
+        }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #1e3c72, #2a5298);
             color: #fff;
             margin: 0;
@@ -27,28 +38,10 @@
         }
 
         h2, h3 {
-            color: #fff;
             margin-bottom: 20px;
         }
 
-        /* Butonlar */
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        /* Input ve Select Alanları */
-        input, select {
+        input, select, button {
             padding: 10px;
             font-size: 16px;
             border-radius: 5px;
@@ -59,278 +52,764 @@
             background: rgba(255, 255, 255, 0.8);
         }
 
-        /* Tablolar */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .score-display {
+            font-size: 24px;
+            margin: 20px 0;
+        }
+
+        .score-section {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+
+        .player-box {
             background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
             border-radius: 10px;
-            overflow: hidden;
+            width: 45%;
         }
 
-        th, td {
-            padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        .point-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
         }
 
-        th {
-            background-color: rgba(255, 255, 255, 0.2);
+        .point-buttons button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 18px;
             font-weight: bold;
         }
 
-        tr:hover {
-            background-color: rgba(255, 255, 255, 0.1);
+        .stats-table {
+            width: 100%;
+            margin-top: 20px;
         }
 
-        /* Logo */
-        .logo {
-            width: 150px;
-            height: auto;
-            position: absolute;
-            top: 20px;
-            left: 20px;
+        .stats-table th, .stats-table td {
+            padding: 8px;
+            text-align: center;
         }
 
-        /* Responsive Tasarım */
+        .service-indicator {
+            font-weight: bold;
+            color: #FFD700;
+            margin: 5px 0;
+        }
+
+        .match-config {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tie-break-info {
+            background-color: #FFD700;
+            color: #000;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .ace-notification {
+            animation: acePulse 1s;
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        @keyframes acePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .match-result-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .match-result-container {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 600px;
+            text-align: center;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .winner-title {
+            font-size: 24px;
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        
+        .winner-name {
+            font-size: 36px;
+            color: #4CAF50;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .match-stats {
+            margin: 20px 0;
+            text-align: left;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px;
+        }
+        
+        .close-result {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
         @media (max-width: 764px) {
             .container {
                 width: 95%;
-                padding: 15px;
+                padding: 10px;
             }
 
-            input, select {
+            input, select, button {
                 width: 100%;
+                font-size: 14px;
+                padding: 12px;
             }
 
-            .logo {
-                width: 100px;
-                top: 10px;
-                left: 10px;
+            .score-section {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .player-box {
+                width: 90%;
+                margin-bottom: 15px;
+            }
+
+            .point-buttons button {
+                width: 50px;
+                height: 50px;
+                font-size: 16px;
+            }
+            
+            .match-result-container {
+                width: 90%;
+                padding: 20px;
+            }
+            
+            .winner-name {
+                font-size: 28px;
             }
         }
     </style>
 </head>
 <body>
-    <img src="./image/İMA__3_-removebg-preview.png" alt="Tenis Logo" class="logo">
-
+    <div class="logo-container">
+        <img src="image/İMA__3_-removebg-preview.png" alt="Logo">
+    </div>
+    
     <div class="container">
-        <h2>Tenis Maç Skorları</h2>
-
-        <!-- Oyuncu Girişi -->
-        <div id="setup">
-            <h3>Oyuncu İsimleri</h3>
-            <input type="text" id="player1Name" placeholder="Oyuncu 1 İsmi">
-            <input type="text" id="player2Name" placeholder="Oyuncu 2 İsmi">
-            <br>
-            <input type="number" id="maxSets" placeholder="Set Sayısı (örn: 3 veya 5)" min="1">
-            <input type="number" id="maxGames" placeholder="Game Sayısı (örn: 6)" min="1">
-            <br>
-            <button onclick="startMatch()">Maça Başla</button>
+        <h2>Profesyonel Tenis Skor Takip Sistemi</h2>
+        
+        <div id="matchSetup">
+            <div class="match-config">
+                <h3>Maç Ayarları</h3>
+                <input type="text" id="player1Name" placeholder="1. Oyuncu Adı" value="">
+                <input type="text" id="player2Name" placeholder="2. Oyuncu Adı" value="">
+                
+                <h3>Maç Formatı</h3>
+                <select id="setLimit">
+                    <option value="1">1 Set</option>
+                    <option value="3" selected>3 Set</option>
+                    <option value="5">5 Set</option>
+                </select>
+                
+                <select id="gameLimit">
+                    <option value="6">6 Game </option>
+                    <option value="4">4 Game </option>
+                </select>
+                
+                <h3>İlk Servis Kullanacak Oyuncu</h3>
+                <select id="firstService">
+                    <option value="1">1. Oyuncu</option>
+                    <option value="2">2. Oyuncu</option>
+                    <option value="random" selected>Rastgele Seç</option>
+                </select>
+            </div>
+            
+            <button id="startMatch">Maçı Başlat</button>
         </div>
-
-        <!-- Maç Ekranı -->
-        <div id="match" style="display: none;">
-            <h3>Maç Skoru</h3>
-            <div style="display: flex; justify-content: space-around;">
-                <div class="player" onclick="addPoint(1)">
-                    <span id="player1Display"></span>
-                    <div class="score" id="player1Score">0</div>
-                    <div class="sets-games">
-                        Set: <span id="player1Set">0</span> | Game: <span id="player1Game">0</span>
+        
+        <div id="matchDisplay" style="display: none;">
+            <div class="score-display">
+                <h3 id="matchFormat">Maç Formatı: 3 Set üzerinden (6 Oyun)</h3>
+                <h3 id="currentSetScore">Set: 0 - 0</h3>
+                <h3 id="currentGameScore">Oyun: 0 - 0</h3>
+                <h1 id="currentPointScore">0 - 0</h1>
+                <p id="tieBreakInfo" class="tie-break-info"></p>
+                <p id="serviceIndicator" class="service-indicator">Servis: Roger Federer</p>
+            </div>
+            
+            <div class="score-section">
+                <div class="player-box">
+                    <h3 id="displayPlayer1Name">Oyuncu 1</h3>
+                    <div class="point-buttons">
+                        <button onclick="addPoint(1)">Puan</button>
+                        <button onclick="addAce(1)">Ace</button>
+                        <button onclick="addStat(1, 'faults')">Hata</button>
+                        <button onclick="addStat(1, 'double_faults')">DF</button>
                     </div>
+                    <table class="stats-table">
+                        <tr>
+                            <th>Ace</th>
+                            <th>Hata</th>
+                            <th>DF</th>
+                            <th>Servis</th>
+                        </tr>
+                        <tr>
+                            <td id="p1Aces">0</td>
+                            <td id="p1Faults">0</td>
+                            <td id="p1DoubleFaults">0</td>
+                            <td id="p1ServiceCount">0</td>
+                        </tr>
+                    </table>
                 </div>
-                <div class="player" onclick="addPoint(2)">
-                    <span id="player2Display"></span>
-                    <div class="score" id="player2Score">0</div>
-                    <div class="sets-games">
-                        Set: <span id="player2Set">0</span> | Game: <span id="player2Game">0</span>
+                
+                <div class="player-box">
+                    <h3 id="displayPlayer2Name">Oyuncu 2</h3>
+                    <div class="point-buttons">
+                        <button onclick="addPoint(2)">Puan</button>
+                        <button onclick="addAce(2)">Ace</button>
+                        <button onclick="addStat(2, 'faults')">Hata</button>
+                        <button onclick="addStat(2, 'double_faults')">DF</button>
                     </div>
+                    <table class="stats-table">
+                        <tr>
+                            <th>Ace</th>
+                            <th>Hata</th>
+                            <th>DF</th>
+                            <th>Servis</th>
+                        </tr>
+                        <tr>
+                            <td id="p2Aces">0</td>
+                            <td id="p2Faults">0</td>
+                            <td id="p2DoubleFaults">0</td>
+                            <td id="p2ServiceCount">0</td>
+                        </tr>
+                    </table>
                 </div>
             </div>
-            <button onclick="endMatch()">Maçı Bitir</button>
+            
+            <div style="margin-top: 20px;">
+                <button id="switchService" onclick="switchService()">Servis Değiştir</button>
+                <button id="resetMatch" onclick="resetMatch()">Maçı Sıfırla</button>
+                <button id="saveMatch" onclick="saveMatch()">Maçı Kaydet</button>
+            </div>
         </div>
+    </div>
 
-        <!-- Maç Analizi -->
-        <div id="analysis" class="analysis" style="display: none;">
-            <h3>Maç Analizi</h3>
-            <p id="winner"></p>
-            <p id="totalSets"></p>
-            <div class="set-results" id="setResults"></div>
+    <!-- Maç Sonuç Ekranı -->
+    <div class="match-result-overlay" id="matchResultOverlay">
+        <div class="match-result-container">
+            <div class="winner-title">MAÇ SONUCU</div>
+            <div class="winner-name" id="winnerNameDisplay"></div>
+            
+            <div class="match-stats">
+                <h3>Maç İstatistikleri</h3>
+                <div class="stat-row">
+                    <span>Toplam Set:</span>
+                    <span id="totalSetsDisplay"></span>
+                </div>
+                <div class="stat-row">
+                    <span>Set Skoru:</span>
+                    <span id="setScoreDisplay"></span>
+                </div>
+                <div class="stat-row">
+                    <span>Toplam Oyun:</span>
+                    <span id="totalGamesDisplay"></span>
+                </div>
+                <div class="stat-row">
+                    <span>Toplam Ace:</span>
+                    <span id="totalAcesDisplay"></span>
+                </div>
+                <div class="stat-row">
+                    <span>Toplam Hata:</span>
+                    <span id="totalFaultsDisplay"></span>
+                </div>
+                <div class="stat-row">
+                    <span>Toplam Double Fault:</span>
+                    <span id="totalDoubleFaultsDisplay"></span>
+                </div>
+                <div class="stat-row">
+                    <span>Toplam Servis:</span>
+                    <span id="totalServicesDisplay"></span>
+                </div>
+            </div>
+            
+            <button class="close-result" onclick="closeResult()">Kapat</button>
         </div>
     </div>
 
     <script>
-        let player1 = {
-            name: "",
-            score: 0,
-            games: 0,
-            sets: 0,
-            setResults: [] // Her setin game skorlarını tutar
+        // Maç verileri
+        let matchData = {
+            player1: { 
+                name: "", 
+                points: 0, 
+                games: 0, 
+                sets: 0, 
+                aces: 0, 
+                faults: 0, 
+                double_faults: 0,
+                serviceCount: 0 
+            },
+            player2: { 
+                name: "", 
+                points: 0, 
+                games: 0, 
+                sets: 0, 
+                aces: 0, 
+                faults: 0, 
+                double_faults: 0,
+                serviceCount: 0 
+            },
+            setLimit: 3,
+            gameLimit: 6,
+            tieBreak: false,
+            currentService: 1,
+            totalGames: 0,
+            isTieBreakStarted: false
         };
-        let player2 = {
-            name: "",
-            score: 0,
-            games: 0,
-            sets: 0,
-            setResults: [] // Her setin game skorlarını tutar
-        };
-        let matchStarted = false;
-        let isTieBreak = false;
-        let maxSets = 3; // Varsayılan set sayısı
-        let maxGames = 6; // Varsayılan game sayısı
 
-        const scoreMap = {
+        // Puan gösterimleri
+        const pointDisplay = {
             0: "0",
             1: "15",
             2: "30",
-            3: "40"
+            3: "40",
+            4: "AD"
         };
 
-        function startMatch() {
-            player1.name = document.getElementById('player1Name').value;
-            player2.name = document.getElementById('player2Name').value;
-            maxSets = parseInt(document.getElementById('maxSets').value);
-            maxGames = parseInt(document.getElementById('maxGames').value);
-
-            if (player1.name && player2.name && maxSets > 0 && maxGames > 0) {
-                document.getElementById('setup').style.display = 'none';
-                document.getElementById('match').style.display = 'block';
-                document.getElementById('player1Display').innerText = player1.name;
-                document.getElementById('player2Display').innerText = player2.name;
-                matchStarted = true;
-            } else {
-                alert("Lütfen tüm alanları doğru şekilde doldurun.");
+        // Maçı başlat
+        document.getElementById('startMatch').addEventListener('click', function() {
+            const player1Name = document.getElementById('player1Name').value.trim() || "Oyuncu 1";
+            const player2Name = document.getElementById('player2Name').value.trim() || "Oyuncu 2";
+            const setLimit = parseInt(document.getElementById('setLimit').value);
+            const gameLimit = parseInt(document.getElementById('gameLimit').value);
+            
+            // Servis kullanacak oyuncuyu belirle
+            let firstService = document.getElementById('firstService').value;
+            if (firstService === 'random') {
+                firstService = Math.random() < 0.5 ? '1' : '2';
             }
-        }
+            
+            // Verileri sıfırla
+            matchData = {
+                player1: { 
+                    name: player1Name, 
+                    points: 0, 
+                    games: 0, 
+                    sets: 0, 
+                    aces: 0, 
+                    faults: 0, 
+                    double_faults: 0,
+                    serviceCount: 0 
+                },
+                player2: { 
+                    name: player2Name, 
+                    points: 0, 
+                    games: 0, 
+                    sets: 0, 
+                    aces: 0, 
+                    faults: 0, 
+                    double_faults: 0,
+                    serviceCount: 0 
+                },
+                setLimit: setLimit,
+                gameLimit: gameLimit,
+                tieBreak: false,
+                currentService: parseInt(firstService),
+                totalGames: 0,
+                isTieBreakStarted: false
+            };
+            
+            // Arayüzü güncelle
+            document.getElementById('displayPlayer1Name').textContent = player1Name;
+            document.getElementById('displayPlayer2Name').textContent = player2Name;
+            document.getElementById('matchSetup').style.display = 'none';
+            document.getElementById('matchDisplay').style.display = 'block';
+            document.getElementById('tieBreakInfo').style.display = 'none';
+            document.getElementById('matchResultOverlay').style.display = 'none';
+            
+            // Maç formatını göster
+            document.getElementById('matchFormat').textContent = 
+                `Maç Formatı: ${setLimit} Set üzerinden (${gameLimit} Oyun)`;
+            
+            updateDisplay();
+            updateServiceIndicator();
+            
+            // İlk servis sayısını artır
+            if (firstService === '1') {
+                matchData.player1.serviceCount++;
+            } else {
 
+                matchData.player2.serviceCount++;
+            }
+            updateStats();
+        });
+
+        // Puan ekle
         function addPoint(player) {
-            if (!matchStarted) return;
-
             if (player === 1) {
-                player1.score++;
+                matchData.player1.points++;
             } else {
-                player2.score++;
+                matchData.player2.points++;
             }
-
-            updateScores();
+            
             checkGame();
+            updateDisplay();
         }
 
-        function updateScores() {
-            if (isTieBreak) {
-                document.getElementById('player1Score').innerText = player1.score;
-                document.getElementById('player2Score').innerText = player2.score;
-            } else {
-                // Deuce (40-40) durumunu kontrol et
-                if (player1.score >= 3 && player2.score >= 3 && player1.score === player2.score) {
-                    document.getElementById('player1Score').innerText = "Deuce";
-                    document.getElementById('player2Score').innerText = "Deuce";
-                } else if (player1.score > 3 || player2.score > 3) {
-                    // Avantaj durumu
-                    if (player1.score > player2.score) {
-                        document.getElementById('player1Score').innerText = "Avantaj";
-                        document.getElementById('player2Score').innerText = "40";
-                    } else {
-                        document.getElementById('player1Score').innerText = "40";
-                        document.getElementById('player2Score').innerText = "Avantaj";
-                    }
-                } else {
-                    // Normal skor durumu
-                    document.getElementById('player1Score').innerText = scoreMap[player1.score] || "40";
-                    document.getElementById('player2Score').innerText = scoreMap[player2.score] || "40";
+        // Ace ekle (puanı da otomatik artırır)
+        function addAce(player) {
+            const playerObj = player === 1 ? matchData.player1 : matchData.player2;
+            playerObj.aces++;
+            
+            // Ace yapınca otomatik puan ekle
+            addPoint(player);
+            
+            // Ace bildirimi göster
+            const aceElement = document.createElement('span');
+            aceElement.className = 'ace-notification';
+            aceElement.textContent = ' ACE!';
+            document.getElementById(`displayPlayer${player}Name`).appendChild(aceElement);
+            
+            // 2 saniye sonra bildirimi kaldır
+            setTimeout(() => {
+                const aceElement = document.querySelector(`#displayPlayer${player}Name .ace-notification`);
+                if (aceElement) {
+                    aceElement.remove();
                 }
-            }
-            document.getElementById('player1Game').innerText = player1.games;
-            document.getElementById('player2Game').innerText = player2.games;
-            document.getElementById('player1Set').innerText = player1.sets;
-            document.getElementById('player2Set').innerText = player2.sets;
+            }, 2000);
+            
+            updateStats();
         }
 
+        // İstatistik ekle
+        function addStat(player, stat) {
+            const playerObj = player === 1 ? matchData.player1 : matchData.player2;
+            playerObj[stat]++;
+            updateStats();
+        }
+
+        // Servis değiştir
+        function switchService() {
+            matchData.currentService = matchData.currentService === 1 ? 2 : 1;
+            updateServiceIndicator();
+            
+            // Servis sayısını artır
+            if (matchData.currentService === 1) {
+                matchData.player1.serviceCount++;
+            } else {
+                matchData.player2.serviceCount++;
+            }
+            updateStats();
+        }
+
+        // Tie-Break kontrolü
+        function checkTieBreak() {
+            if (matchData.player1.games === matchData.gameLimit && 
+                matchData.player2.games === matchData.gameLimit && 
+                !matchData.isTieBreakStarted) {
+                
+                matchData.tieBreak = true;
+                matchData.isTieBreakStarted = true;
+                
+                // Tie-Break başlangıç mesajı
+                document.getElementById('tieBreakInfo').textContent = 
+                    `Tie-Break başladı! İlk 7 puan alan 2 farkla kazanır. Servis her 2 puanda bir değişir.`;
+                document.getElementById('tieBreakInfo').style.display = 'block';
+                
+                // Tie-Break'te ilk servis normal sıradaki oyuncu
+                matchData.currentService = matchData.totalGames % 2 === 0 ? 1 : 2;
+                updateServiceIndicator();
+            }
+        }
+
+        // Oyun kontrolü
         function checkGame() {
-            if (isTieBreak) {
-                if ((player1.score >= 7 || player2.score >= 7) && Math.abs(player1.score - player2.score) >= 2) {
-                    endSet();
+            const p1 = matchData.player1.points;
+            const p2 = matchData.player2.points;
+            
+            // Tie-Break kontrolü
+            checkTieBreak();
+            
+            if (!matchData.tieBreak) {
+                // Normal oyun kuralları
+                if (p1 >= 4 && p1 - p2 >= 2) {
+                    winGame(1);
+                } else if (p2 >= 4 && p2 - p1 >= 2) {
+                    winGame(2);
                 }
             } else {
-                // Deuce durumunda avantaj kontrolü
-                if (player1.score >= 3 && player2.score >= 3) {
-                    if (Math.abs(player1.score - player2.score) >= 2) {
-                        if (player1.score > player2.score) {
-                            player1.games++;
-                        } else {
-                            player2.games++;
-                        }
-                        resetGame();
-                        checkSet();
-                    }
-                } else if ((player1.score >= 4 || player2.score >= 4) && Math.abs(player1.score - player2.score) >= 2) {
-                    if (player1.score > player2.score) {
-                        player1.games++;
+                // Tie-Break kuralları
+                if ((p1 >= 7 && p1 - p2 >= 2) || (p2 >= 7 && p2 - p1 >= 2)) {
+                    if (p1 > p2) {
+                        winGame(1);
                     } else {
-                        player2.games++;
+                        winGame(2);
                     }
-                    resetGame();
-                    checkSet();
+                    // Tie-Break sona erdi
+                    matchData.tieBreak = false;
+                    matchData.isTieBreakStarted = false;
+                    document.getElementById('tieBreakInfo').style.display = 'none';
                 }
+            }
+            
+            checkSet();
+        }
+
+        // Oyun kazanma fonksiyonu
+        function winGame(player) {
+            if (player === 1) {
+                matchData.player1.games++;
+            } else {
+                matchData.player2.games++;
+            }
+            matchData.totalGames++;
+            resetPoints();
+            
+            // Tie-Break dışında servis değişimi
+            if (!matchData.tieBreak) {
+                checkServiceChange();
             }
         }
 
-        function resetGame() {
-            player1.score = 0;
-            player2.score = 0;
-            updateScores();
+        // Servis değişimini kontrol et
+        function checkServiceChange() {
+            if (matchData.tieBreak) {
+                // Tie-Break'te her 2 puanda bir servis değişir
+                const totalPoints = matchData.player1.points + matchData.player2.points;
+                if (totalPoints > 0 && totalPoints % 2 === 0) {
+                    switchService();
+                }
+            } else {
+                // Normal oyunlarda her oyundan sonra servis değişir
+                switchService();
+            }
         }
 
+        // Set kontrolü
         function checkSet() {
-            if (player1.games >= maxGames || player2.games >= maxGames) {
-                if (Math.abs(player1.games - player2.games) >= 2) {
-                    endSet();
-                } else if (player1.games === maxGames && player2.games === maxGames) {
-                    isTieBreak = true;
+            const p1 = matchData.player1.games;
+            const p2 = matchData.player2.games;
+            
+            if (p1 >= matchData.gameLimit && p1 - p2 >= 2) {
+                matchData.player1.sets++;
+                resetGames();
+            } else if (p2 >= matchData.gameLimit && p2 - p1 >= 2) {
+                matchData.player2.sets++;
+                resetGames();
+            }
+            
+            // Maç sonu kontrolü
+            if (matchData.player1.sets === matchData.setLimit || matchData.player2.sets === matchData.setLimit) {
+                const winner = matchData.player1.sets > matchData.player2.sets ? 
+                              matchData.player1 : matchData.player2;
+                const loser = matchData.player1.sets > matchData.player2.sets ? 
+                             matchData.player2 : matchData.player1;
+                
+                showMatchResult(winner, loser);
+            }
+        }
+
+        // Maç sonucunu göster
+        function showMatchResult(winner, loser) {
+            // Kazananı göster
+            document.getElementById('winnerNameDisplay').textContent = winner.name;
+            
+            // İstatistikleri hesapla
+            const totalSets = matchData.player1.sets + matchData.player2.sets;
+            const totalGames = matchData.totalGames;
+            const totalAces = matchData.player1.aces + matchData.player2.aces;
+            const totalFaults = matchData.player1.faults + matchData.player2.faults;
+            const totalDoubleFaults = matchData.player1.double_faults + matchData.player2.double_faults;
+            const totalServices = matchData.player1.serviceCount + matchData.player2.serviceCount;
+            
+            // İstatistikleri göster
+            document.getElementById('totalSetsDisplay').textContent = totalSets;
+            document.getElementById('setScoreDisplay').textContent = 
+                `${winner.sets}-${loser.sets}`;
+            document.getElementById('totalGamesDisplay').textContent = totalGames;
+            document.getElementById('totalAcesDisplay').textContent = 
+                `${totalAces} (${winner.aces}-${loser.aces})`;
+            document.getElementById('totalFaultsDisplay').textContent = 
+                `${totalFaults} (${winner.faults}-${loser.faults})`;
+            document.getElementById('totalDoubleFaultsDisplay').textContent = 
+                `${totalDoubleFaults} (${winner.double_faults}-${loser.double_faults})`;
+            document.getElementById('totalServicesDisplay').textContent = 
+                `${totalServices} (${winner.serviceCount}-${loser.serviceCount})`;
+            
+            // Maç sonu ekranını göster
+            document.getElementById('matchResultOverlay').style.display = 'flex';
+            
+            // Ana skor ekranını gizle
+            document.getElementById('matchDisplay').style.display = 'none';
+        }
+
+        // Sonuç ekranını kapat
+        function closeResult() {
+            document.getElementById('matchResultOverlay').style.display = 'none';
+            document.getElementById('matchSetup').style.display = 'block';
+        }
+
+        // Puanları sıfırla
+        function resetPoints() {
+            matchData.player1.points = 0;
+            matchData.player2.points = 0;
+        }
+
+        // Oyunları sıfırla
+        function resetGames() {
+            matchData.player1.games = 0;
+            matchData.player2.games = 0;
+        }
+
+        // Arayüzü güncelle
+        function updateDisplay() {
+            // Puanları göster
+            let p1Points = matchData.player1.points;
+            let p2Points = matchData.player2.points;
+            
+            if (!matchData.tieBreak) {
+                let p1Display = pointDisplay[Math.min(p1Points, 4)];
+                let p2Display = pointDisplay[Math.min(p2Points, 4)];
+                
+                // Advantage durumu
+                if (p1Points >= 4 && p2Points >= 4) {
+                    if (p1Points === p2Points) {
+                        p1Display = "40";
+                        p2Display = "40";
+                    } else if (p1Points > p2Points) {
+                        p1Display = "AD";
+                        p2Display = "40";
+                    } else {
+                        p1Display = "40";
+                        p2Display = "AD";
+                    }
                 }
-            }
-        }
-
-        function endSet() {
-            if (player1.games > player2.games) {
-                player1.sets++;
-                player1.setResults.push(`${player1.games}-${player2.games}`);
+                
+                document.getElementById('currentPointScore').textContent = p1Display + " - " + p2Display;
             } else {
-                player2.sets++;
-                player2.setResults.push(`${player2.games}-${player1.games}`);
+                document.getElementById('currentPointScore').textContent = p1Points + " - " + p2Points + " (TB)";
             }
-            updateScores();
+            
+            // Oyun ve set skorları
+            document.getElementById('currentGameScore').textContent = 
+                "Oyun: " + matchData.player1.games + " - " + matchData.player2.games;
+            document.getElementById('currentSetScore').textContent = 
+                "Set: " + matchData.player1.sets + " - " + matchData.player2.sets;
+            
+            // İstatistikleri güncelle
+            updateStats();
+        }
 
-            if (player1.sets >= maxSets || player2.sets >= maxSets) {
-                endMatch();
+        // Servis göstergeci güncelle
+        function updateServiceIndicator() {
+            const servingPlayer = matchData.currentService === 1 ? 
+                                 matchData.player1.name : matchData.player2.name;
+            document.getElementById('serviceIndicator').textContent = "Servis: " + servingPlayer;
+            
+            // Vurgulama ekle
+            if (matchData.currentService === 1) {
+                document.getElementById('displayPlayer1Name').style.color = "#FFD700";
+                document.getElementById('displayPlayer2Name').style.color = "#fff";
             } else {
-                resetSet();
+                document.getElementById('displayPlayer1Name').style.color = "#fff";
+                document.getElementById('displayPlayer2Name').style.color = "#FFD700";
             }
         }
 
-        function resetSet() {
-            player1.games = 0;
-            player2.games = 0;
-            isTieBreak = false;
-            resetGame();
+        // İstatistikleri güncelle
+        function updateStats() {
+            document.getElementById('p1Aces').textContent = matchData.player1.aces;
+            document.getElementById('p1Faults').textContent = matchData.player1.faults;
+            document.getElementById('p1DoubleFaults').textContent = matchData.player1.double_faults;
+            document.getElementById('p1ServiceCount').textContent = matchData.player1.serviceCount;
+            
+            document.getElementById('p2Aces').textContent = matchData.player2.aces;
+            document.getElementById('p2Faults').textContent = matchData.player2.faults;
+            document.getElementById('p2DoubleFaults').textContent = matchData.player2.double_faults;
+            document.getElementById('p2ServiceCount').textContent = matchData.player2.serviceCount;
         }
 
-        function endMatch() {
-            matchStarted = false;
-            document.getElementById('match').style.display = 'none';
-            document.getElementById('analysis').style.display = 'block';
-
-            let winner = player1.sets > player2.sets ? player1.name : player2.name;
-            document.getElementById('winner').innerText = `Kazanan: ${winner}`;
-            document.getElementById('totalSets').innerText = `Set Skoru: ${player1.sets} - ${player2.sets}`;
-
-            // Set sonuçlarını göster
-            let setResultsHTML = "<h3>Set Sonuçları:</h3>";
-            for (let i = 0; i < player1.setResults.length; i++) {
-                setResultsHTML += `<p>Set ${i + 1}: ${player1.name} ${player1.setResults[i]} | ${player2.name} ${player2.setResults[i]}</p>`;
+        // Maçı sıfırla
+        function resetMatch() {
+            if (confirm("Maçı sıfırlamak istediğinize emin misiniz? Tüm veriler kaybolacak!")) {
+                document.getElementById('matchDisplay').style.display = 'none';
+                document.getElementById('matchSetup').style.display = 'block';
+                document.getElementById('matchResultOverlay').style.display = 'none';
             }
-            document.getElementById('setResults').innerHTML = setResultsHTML;
+        }
+
+        // Maçı kaydet
+        function saveMatch() {
+            const now = new Date();
+            const fileName = "Tenis_Maci_" + matchData.player1.name + "_vs_" + 
+                            matchData.player2.name + "_" + 
+                            now.toISOString().replace(/[:.]/g, "-") + ".json";
+            
+            const dataStr = JSON.stringify(matchData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            
+            // İndirme bağlantısı oluştur
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = fileName;
+            downloadLink.click();
+            
+            alert("Maç başarıyla kaydedildi!");
         }
     </script>
 </body>
